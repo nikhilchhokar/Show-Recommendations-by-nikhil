@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Grid, 
-  TextField, 
-  Button, 
-  Snackbar, 
-  Alert,
-  CircularProgress,
+import {
+  Box,
+  Typography,
+  Grid,
+  TextField,
+  Button,
   Paper,
   Tabs,
   Tab,
@@ -15,19 +12,19 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  useTheme,
-  Chip,
+  Snackbar,
+  Alert,
+  IconButton,
   Stack,
-  IconButton
+  Chip,
+  useTheme
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import DeleteIcon from '@mui/icons-material/Delete';
-import ShowCard from './ShowCard';
-import Recommendations from './Recommendations';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
+import ShowCard from './ShowCard';
+import Recommendations from './Recommendations';
 
 const API_URL = 'http://localhost:5001/api';
 
@@ -55,24 +52,6 @@ const StyledButton = styled(Button)(({ theme }) => ({
   '&:hover': {
     transform: 'translateY(-2px)',
     boxShadow: '0 6px 10px 4px rgba(33, 203, 243, .3)',
-  },
-}));
-
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '12px',
-    transition: 'all 0.3s ease',
-    '&:hover': {
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: theme.palette.primary.main,
-      },
-    },
-    '&.Mui-focused': {
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: theme.palette.primary.main,
-        borderWidth: '2px',
-      },
-    },
   },
 }));
 
@@ -107,38 +86,29 @@ function ShowsList() {
   const [shows, setShows] = useState([]);
   const [genres, setGenres] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState('All');
-  const [favorites, setFavorites] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
+  const [openAddShowDialog, setOpenAddShowDialog] = useState(false);
   const [showForm, setShowForm] = useState({
     title: '',
-    year: '',
-    type: 'series',
-    poster: '',
-    imdbRating: '',
-    genre: ''
+    genre: '',
+    rating: 0,
+    poster: ''
   });
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [openAddShowDialog, setOpenAddShowDialog] = useState(false);
   const theme = useTheme();
 
   useEffect(() => {
     fetchShows();
     fetchGenres();
-    fetchFavorites();
   }, []);
 
   const fetchShows = async () => {
     try {
-      setLoading(true);
       const response = await axios.get(`${API_URL}/shows`);
       setShows(response.data);
     } catch (error) {
       console.error('Error fetching shows:', error);
       setError('Failed to load shows');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -148,15 +118,6 @@ function ShowsList() {
       setGenres(['All', ...response.data]);
     } catch (error) {
       console.error('Error fetching genres:', error);
-    }
-  };
-
-  const fetchFavorites = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/favorites`);
-      setFavorites(response.data.map(fav => fav.show_id));
-    } catch (error) {
-      console.error('Error fetching favorites:', error);
     }
   };
 
@@ -173,7 +134,7 @@ function ShowsList() {
   };
 
   const handleAddShow = async () => {
-    if (!showForm.title || !showForm.year || !showForm.genre) {
+    if (!showForm.title || !showForm.genre) {
       setError('Please fill in all required fields');
       return;
     }
@@ -183,32 +144,14 @@ function ShowsList() {
       setShows(prev => [...prev, response.data]);
       setShowForm({
         title: '',
-        year: '',
-        type: 'series',
-        poster: '',
-        imdbRating: '',
-        genre: ''
+        genre: '',
+        rating: 0,
+        poster: ''
       });
       setOpenAddShowDialog(false);
-      setSuccess('Show added successfully!');
     } catch (error) {
       console.error('Error adding show:', error);
       setError('Failed to add show');
-    }
-  };
-
-  const handleToggleFavorite = async (showId) => {
-    try {
-      if (favorites.includes(showId)) {
-        await axios.delete(`${API_URL}/favorites/${showId}`);
-        setFavorites(prev => prev.filter(id => id !== showId));
-      } else {
-        await axios.post(`${API_URL}/favorites`, { show_id: showId });
-        setFavorites(prev => [...prev, showId]);
-      }
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-      setError('Failed to update favorites');
     }
   };
 
@@ -220,16 +163,10 @@ function ShowsList() {
     try {
       await axios.delete(`${API_URL}/shows/${id}`);
       setShows(prev => prev.filter(show => show.id !== id));
-      setSuccess('Show deleted successfully!');
     } catch (error) {
       console.error('Error deleting show:', error);
       setError('Failed to delete show');
     }
-  };
-
-  const handleCloseSnackbar = () => {
-    setError('');
-    setSuccess('');
   };
 
   const filteredShows = selectedGenre === 'All' 
@@ -320,13 +257,6 @@ function ShowsList() {
                     required
                   />
                   <TextField
-                    label="Year"
-                    name="year"
-                    value={showForm.year}
-                    onChange={handleShowInputChange}
-                    required
-                  />
-                  <TextField
                     label="Genre"
                     name="genre"
                     value={showForm.genre}
@@ -340,9 +270,9 @@ function ShowsList() {
                     onChange={handleShowInputChange}
                   />
                   <TextField
-                    label="IMDB Rating"
-                    name="imdbRating"
-                    value={showForm.imdbRating}
+                    label="Rating"
+                    name="rating"
+                    value={showForm.rating}
                     onChange={handleShowInputChange}
                   />
                 </Box>
@@ -395,21 +325,21 @@ function ShowsList() {
       </StyledPaper>
 
       <Snackbar
-        open={!!error || !!success}
+        open={!!error}
         autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
+        onClose={() => setError('')}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert
-          onClose={handleCloseSnackbar}
-          severity={error ? 'error' : 'success'}
+          onClose={() => setError('')}
+          severity="error"
           sx={{ 
             width: '100%',
             borderRadius: '12px',
             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
           }}
         >
-          {error || success}
+          {error}
         </Alert>
       </Snackbar>
     </Box>

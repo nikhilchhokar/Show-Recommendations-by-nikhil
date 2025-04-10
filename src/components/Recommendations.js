@@ -2,15 +2,14 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  Grid,
   List,
   ListItem,
-  ListItemText,
-  IconButton,
-  TextField,
   Button,
+  TextField,
   Paper,
-  useTheme
+  IconButton,
+  useTheme,
+  Grid
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
@@ -71,9 +70,6 @@ function Recommendations() {
     recommenderName: '',
     reason: ''
   });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false);
   const theme = useTheme();
 
   useEffect(() => {
@@ -82,14 +78,10 @@ function Recommendations() {
 
   const fetchRecommendations = async () => {
     try {
-      setLoading(true);
       const response = await axios.get(`${API_URL}/recommendations`);
       setRecommendations(response.data);
     } catch (error) {
       console.error('Error fetching recommendations:', error);
-      setError('Failed to load recommendations');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -103,7 +95,6 @@ function Recommendations() {
 
   const handleAddRecommendation = async () => {
     if (!recommendationForm.showName || !recommendationForm.genre || !recommendationForm.recommenderName) {
-      setError('Please fill in all required fields');
       return;
     }
 
@@ -116,10 +107,8 @@ function Recommendations() {
         recommenderName: '',
         reason: ''
       });
-      setSuccess('Recommendation added successfully!');
     } catch (error) {
       console.error('Error adding recommendation:', error);
-      setError('Failed to add recommendation');
     }
   };
 
@@ -127,10 +116,8 @@ function Recommendations() {
     try {
       await axios.delete(`${API_URL}/recommendations/${id}`);
       setRecommendations(prev => prev.filter(rec => rec.id !== id));
-      setSuccess('Recommendation deleted successfully!');
     } catch (error) {
       console.error('Error deleting recommendation:', error);
-      setError('Failed to delete recommendation');
     }
   };
 

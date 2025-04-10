@@ -10,7 +10,7 @@
 
 # production
 /build
-/backend/build
+/dist
 
 # misc
 .DS_Store
@@ -30,6 +30,9 @@ yarn-error.log*
 .vscode/
 *.swp
 *.swo
+
+# OS
+Thumbs.db
 
 # Environment variables
 backend/.env
