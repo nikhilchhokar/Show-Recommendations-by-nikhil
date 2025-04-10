@@ -15,7 +15,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5001/api';
+// Use environment variable for API URL
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   background: 'linear-gradient(145deg, #1a1a1a, #2a2a2a)',
