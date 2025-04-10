@@ -9,9 +9,7 @@ const port = process.env.PORT || 5001;
 
 // Enable CORS for all routes
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL 
-    : 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'https://show-recommendations-app.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
