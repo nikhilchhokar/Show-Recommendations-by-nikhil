@@ -14,7 +14,9 @@ function ShowCard({ show }) {
   console.log('ShowCard received show:', show);
   
   // Convert rating to number for the Rating component
-  const ratingValue = show.imdb_rating === 'N/A' ? 0 : parseFloat(show.imdb_rating) / 2;
+  const ratingValue = show.imdb_rating && !isNaN(parseFloat(show.imdb_rating))
+    ? parseFloat(show.imdb_rating) / 2
+    : 0;
   
   // Split genres into array if they exist
   const genres = show.genre ? show.genre.split(',').map(g => g.trim()) : [];
@@ -82,4 +84,4 @@ function ShowCard({ show }) {
   );
 }
 
-export default ShowCard; 
+export default ShowCard;

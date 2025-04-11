@@ -2,9 +2,9 @@ const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
 const sequelize = new Sequelize(
-  process.env.DB_NAME || 'show_recommendations',
+  process.env.DB_NAME || 'postgres',
   process.env.DB_USER || 'postgres',
-  process.env.DB_PASSWORD || 'postgres',
+  process.env.DB_PASSWORD || 'postgres1',
   {
     host: process.env.DB_HOST || 'localhost',
     dialect: 'postgres',

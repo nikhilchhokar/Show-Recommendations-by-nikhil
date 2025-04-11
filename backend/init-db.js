@@ -5,8 +5,8 @@ const config = {
   user: process.env.DB_USER || 'postgres',
   host: process.env.DB_HOST || 'localhost',
   database: 'postgres', // Connect to default database first
-  password: process.env.DB_PASSWORD || 'postgres',
-  port: process.env.DB_PORT || 5432,
+  password: process.env.DB_PASSWORD || 'postgres1',
+  port: process.env.DB_PORT || 5000,
 };
 
 async function initDatabase() {
@@ -18,7 +18,7 @@ async function initDatabase() {
 
   try {
     // Create database if it doesn't exist
-    await client.query('CREATE DATABASE show_recommendations');
+    await client.query('CREATE DATABASE postgres');
     console.log('Database created successfully');
   } catch (error) {
     if (error.code === '42P04') { // Database already exists
@@ -35,7 +35,7 @@ async function initDatabase() {
   // Connect to the new database
   const dbConfig = {
     ...config,
-    database: 'show_recommendations',
+    database: 'postgres',
   };
 
   console.log('Connecting to show_recommendations database...');

@@ -16,7 +16,7 @@ import { styled } from '@mui/material/styles';
 import axios from 'axios';
 
 // Use environment variable for API URL
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+const API_URL = 'http://localhost:5001/api';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   background: 'linear-gradient(145deg, #1a1a1a, #2a2a2a)',
@@ -66,9 +66,9 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 function Recommendations() {
   const [recommendations, setRecommendations] = useState([]);
   const [recommendationForm, setRecommendationForm] = useState({
-    showName: '',
+    show_name: '', // Changed from showName
     genre: '',
-    recommenderName: '',
+    recommender_name: '', // Changed from recommenderName
     reason: ''
   });
   const theme = useTheme();
@@ -95,21 +95,25 @@ function Recommendations() {
   };
 
   const handleAddRecommendation = async () => {
-    if (!recommendationForm.showName || !recommendationForm.genre || !recommendationForm.recommenderName) {
+    if (!recommendationForm.show_name || !recommendationForm.genre || !recommendationForm.recommender_name) {
+      alert('Please fill in all required fields.');
       return;
     }
 
     try {
-      const response = await axios.post(`${API_URL}/recommendations`, recommendationForm);
-      setRecommendations(prev => [response.data, ...prev]);
+      console.log('Sending recommendation:', recommendationForm); // Debugging log
+      await axios.post(`${API_URL}/recommendations`, recommendationForm);
+      console.log('Recommendation added successfully');
+      fetchRecommendations(); // Fetch the updated list of recommendations
       setRecommendationForm({
-        showName: '',
+        show_name: '',
         genre: '',
-        recommenderName: '',
+        recommender_name: '',
         reason: ''
       });
     } catch (error) {
       console.error('Error adding recommendation:', error);
+      alert('Failed to add recommendation. Please try again.');
     }
   };
 
@@ -135,8 +139,8 @@ function Recommendations() {
                 <StyledTextField
                   fullWidth
                   label="Show Name"
-                  name="showName"
-                  value={recommendationForm.showName}
+                  name="show_name" // Changed from showName
+                  value={recommendationForm.show_name}
                   onChange={handleRecommendationInputChange}
                 />
               </Grid>
@@ -153,8 +157,8 @@ function Recommendations() {
                 <StyledTextField
                   fullWidth
                   label="Your Name"
-                  name="recommenderName"
-                  value={recommendationForm.recommenderName}
+                  name="recommender_name" // Changed from recommenderName
+                  value={recommendationForm.recommender_name}
                   onChange={handleRecommendationInputChange}
                 />
               </Grid>
@@ -230,4 +234,4 @@ function Recommendations() {
   );
 }
 
-export default Recommendations; 
+export default Recommendations;

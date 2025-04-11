@@ -17,7 +17,10 @@ import {
   IconButton,
   Stack,
   Chip,
-  useTheme
+  useTheme,
+  Checkbox,
+  FormControlLabel,
+  FormGroup
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -27,7 +30,7 @@ import ShowCard from './ShowCard';
 import Recommendations from './Recommendations';
 
 // Use environment variable for API URL
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+const API_URL ='http://localhost:5001/api';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   background: 'linear-gradient(145deg, #1a1a1a, #2a2a2a)',
@@ -87,6 +90,7 @@ function ShowsList() {
   const [shows, setShows] = useState([]);
   const [genres, setGenres] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState('All');
+  const [selectedGenres, setSelectedGenres] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
   const [openAddShowDialog, setOpenAddShowDialog] = useState(false);
   const [showForm, setShowForm] = useState({
@@ -112,29 +116,28 @@ function ShowsList() {
       console.log('Fetching shows from:', `${API_URL}/shows`);
       const response = await axios.get(`${API_URL}/shows`);
       console.log('API Response:', response);
-      
+
       if (response.data && Array.isArray(response.data)) {
         setShows(response.data);
-        // Extract unique genres
-        const uniqueGenres = new Set();
-        response.data.forEach(show => {
-          if (show.genre) {
-            show.genre.split(',').forEach(g => uniqueGenres.add(g.trim()));
-          }
-        });
-        setGenres(['All', ...Array.from(uniqueGenres)]);
       } else {
         console.error('Invalid response format:', response.data);
         setError('No shows found. Try adding some shows!');
       }
+
+      // Fetch all genres
+      console.log('Fetching genres from:', `${API_URL}/genres`);
+      const genresResponse = await axios.get(`${API_URL}/genres`);
+      console.log('Genres Response:', genresResponse);
+
+      if (genresResponse.data && Array.isArray(genresResponse.data)) {
+        setGenres(['All', ...genresResponse.data]);
+      } else {
+        console.error('Invalid genres response format:', genresResponse.data);
+        setError('Failed to load genres.');
+      }
     } catch (error) {
-      console.error('Error fetching shows:', error);
-      console.error('Error details:', {
-        message: error.message,
-        response: error.response,
-        request: error.request
-      });
-      setError('Failed to load shows. Please check if the backend server is running.');
+      console.error('Error fetching shows or genres:', error);
+      setError('Failed to load shows or genres. Please check if the backend server is running.');
     } finally {
       setLoading(false);
     }
@@ -152,31 +155,47 @@ function ShowsList() {
     }));
   };
 
+  const handleGenreChange = (event) => {
+    const { value, checked } = event.target;
+    setSelectedGenres((prev) =>
+      checked ? [...prev, value] : prev.filter((genre) => genre !== value)
+    );
+  };
+
   const handleAddShow = async () => {
-    if (!showForm.title || !showForm.genre) {
-      setError('Please fill in all required fields');
+    if (!showForm.title || selectedGenres.length === 0) {
+      setError('Please fill in all required fields and select at least one genre.');
       return;
     }
-
+  
     try {
-      console.log('Adding show:', showForm);
-      const response = await axios.post(`${API_URL}/shows`, showForm);
+      const newShow = {
+        title: showForm.title,
+        year: showForm.year || null,
+        genre: selectedGenres.join(', '), // Combine selected genres into a string
+        poster: showForm.poster || null,
+        imdb_rating: showForm.rating || null, // Ensure rating is included
+      };
+  
+      console.log('Adding show:', newShow); // Debugging log
+      const response = await axios.post(`${API_URL}/shows`, newShow);
       console.log('Add show response:', response.data);
       setShows(prev => [...prev, response.data]);
       setShowForm({
         title: '',
-        genre: '',
-        rating: 0,
-        poster: '',
         year: '',
-        imdb_rating: ''
+        genre: '',
+        poster: '',
+        rating: '', // Reset the rating field
       });
+      setSelectedGenres([]); // Reset selected genres
       setOpenAddShowDialog(false);
     } catch (error) {
       console.error('Error adding show:', error);
-      setError('Failed to add show');
+      setError('Failed to add show. Please try again.');
     }
   };
+  
 
   const handleDeleteShow = async (id) => {
     if (!window.confirm('Are you sure you want to delete this show?')) {
@@ -280,9 +299,9 @@ function ShowsList() {
                     required
                   />
                   <TextField
-                    label="Genre"
-                    name="genre"
-                    value={showForm.genre}
+                    label="Year"
+                    name="year" // Add this field for the year
+                    value={showForm.year}
                     onChange={handleShowInputChange}
                     required
                   />
@@ -298,6 +317,23 @@ function ShowsList() {
                     value={showForm.rating}
                     onChange={handleShowInputChange}
                   />
+
+                  {/* Genre Checkboxes */}
+                  <FormGroup>
+                    {genres.map((genre) => (
+                      <FormControlLabel
+                        key={genre}
+                        control={
+                          <Checkbox
+                            value={genre}
+                            checked={selectedGenres.includes(genre)}
+                            onChange={handleGenreChange}
+                          />
+                        }
+                        label={genre}
+                      />
+                    ))}
+                  </FormGroup>
                 </Box>
               </DialogContent>
               <DialogActions sx={{ p: 2 }}>
@@ -369,4 +405,4 @@ function ShowsList() {
   );
 }
 
-export default ShowsList; 
+export default ShowsList;

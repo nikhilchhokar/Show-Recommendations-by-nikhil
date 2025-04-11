@@ -2,6 +2,8 @@ import React from 'react';
 import { ThemeProvider, CssBaseline, Container } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import ShowsList from './components/ShowsList';
+import './App.css';
+import Footer from './components/footer';
 
 const theme = createTheme({
   palette: {
@@ -29,8 +31,9 @@ function App() {
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <ShowsList />
       </Container>
+      <Footer />
     </ThemeProvider>
   );
 }
 
-export default App; 
+export default App;

@@ -7,9 +7,27 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: #121212;
   color: white;
+  line-height: 1.5; /* Improve readability */
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px; /* Adjust font size for smaller screens */
+  }
+
+  code {
+    font-size: 12px; /* Adjust code font size for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 12px; /* Further reduce font size for very small screens */
+  }
 }
