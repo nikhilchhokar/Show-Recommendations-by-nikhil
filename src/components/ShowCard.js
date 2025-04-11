@@ -11,6 +11,8 @@ import {
 } from '@mui/material';
 
 function ShowCard({ show }) {
+  console.log('ShowCard received show:', show);
+  
   // Convert rating to number for the Rating component
   const ratingValue = show.imdb_rating === 'N/A' ? 0 : parseFloat(show.imdb_rating) / 2;
   
@@ -23,13 +25,17 @@ function ShowCard({ show }) {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        bgcolor: 'background.paper'
+        bgcolor: 'background.paper',
+        transition: 'transform 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-5px)',
+        }
       }}
     >
       <CardMedia
         component="img"
         height="300"
-        image={show.poster}
+        image={show.poster || 'https://via.placeholder.com/300x450?text=No+Poster'}
         alt={show.title}
         sx={{ objectFit: 'cover' }}
       />
@@ -37,9 +43,11 @@ function ShowCard({ show }) {
         <Typography gutterBottom variant="h6" component="div">
           {show.title}
         </Typography>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          {show.year}
-        </Typography>
+        {show.year && (
+          <Typography variant="body2" color="text.secondary" gutterBottom>
+            {show.year}
+          </Typography>
+        )}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <Rating 
             value={ratingValue} 
@@ -47,24 +55,28 @@ function ShowCard({ show }) {
             readOnly 
             size="small"
           />
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-            {show.imdb_rating}
-          </Typography>
+          {show.imdb_rating && (
+            <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+              {show.imdb_rating}
+            </Typography>
+          )}
         </Box>
-        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-          {genres.map((genre, index) => (
-            <Chip 
-              key={index}
-              label={genre}
-              size="small"
-              sx={{ 
-                backgroundColor: 'primary.main',
-                color: 'primary.contrastText',
-                mb: 0.5
-              }}
-            />
-          ))}
-        </Stack>
+        {genres.length > 0 && (
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            {genres.map((genre, index) => (
+              <Chip 
+                key={index}
+                label={genre}
+                size="small"
+                sx={{ 
+                  backgroundColor: 'primary.main',
+                  color: 'primary.contrastText',
+                  mb: 0.5
+                }}
+              />
+            ))}
+          </Stack>
+        )}
       </CardContent>
     </Card>
   );

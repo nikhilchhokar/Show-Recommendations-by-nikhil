@@ -93,32 +93,45 @@ function ShowsList() {
     title: '',
     genre: '',
     rating: 0,
-    poster: ''
+    poster: '',
+    year: '',
+    imdb_rating: ''
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
   const theme = useTheme();
 
   useEffect(() => {
+    console.log('API URL:', API_URL);
     fetchShows();
-    fetchGenres();
   }, []);
 
   const fetchShows = async () => {
     try {
+      setLoading(true);
+      console.log('Fetching shows from:', `${API_URL}/shows`);
       const response = await axios.get(`${API_URL}/shows`);
-      setShows(response.data);
+      console.log('API Response:', response.data);
+      
+      if (response.data && Array.isArray(response.data)) {
+        setShows(response.data);
+        // Extract unique genres
+        const uniqueGenres = new Set();
+        response.data.forEach(show => {
+          if (show.genre) {
+            show.genre.split(',').forEach(g => uniqueGenres.add(g.trim()));
+          }
+        });
+        setGenres(['All', ...Array.from(uniqueGenres)]);
+      } else {
+        console.error('Invalid response format:', response.data);
+        setError('Invalid data received from server');
+      }
     } catch (error) {
       console.error('Error fetching shows:', error);
-      setError('Failed to load shows');
-    }
-  };
-
-  const fetchGenres = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/genres`);
-      setGenres(['All', ...response.data]);
-    } catch (error) {
-      console.error('Error fetching genres:', error);
+      setError('Failed to load shows. Please check if the backend is running.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -141,13 +154,17 @@ function ShowsList() {
     }
 
     try {
+      console.log('Adding show:', showForm);
       const response = await axios.post(`${API_URL}/shows`, showForm);
+      console.log('Add show response:', response.data);
       setShows(prev => [...prev, response.data]);
       setShowForm({
         title: '',
         genre: '',
         rating: 0,
-        poster: ''
+        poster: '',
+        year: '',
+        imdb_rating: ''
       });
       setOpenAddShowDialog(false);
     } catch (error) {
