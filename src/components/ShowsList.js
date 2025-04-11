@@ -111,7 +111,7 @@ function ShowsList() {
       setLoading(true);
       console.log('Fetching shows from:', `${API_URL}/shows`);
       const response = await axios.get(`${API_URL}/shows`);
-      console.log('API Response:', response.data);
+      console.log('API Response:', response);
       
       if (response.data && Array.isArray(response.data)) {
         setShows(response.data);
@@ -125,11 +125,16 @@ function ShowsList() {
         setGenres(['All', ...Array.from(uniqueGenres)]);
       } else {
         console.error('Invalid response format:', response.data);
-        setError('Invalid data received from server');
+        setError('No shows found. Try adding some shows!');
       }
     } catch (error) {
       console.error('Error fetching shows:', error);
-      setError('Failed to load shows. Please check if the backend is running.');
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response,
+        request: error.request
+      });
+      setError('Failed to load shows. Please check if the backend server is running.');
     } finally {
       setLoading(false);
     }
