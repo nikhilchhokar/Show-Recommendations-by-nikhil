@@ -5,7 +5,7 @@
   "description": "Frontend for Show Recommendations App",
   "main": "index.js",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node --max-old-space-size=2048 server.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

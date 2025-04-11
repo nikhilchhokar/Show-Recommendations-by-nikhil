@@ -13,7 +13,7 @@ const pool = new Pool({
 
 // Enable CORS for all routes
 app.use(cors({
-  origin: ['http://localhost:3000'], // Ensure this matches your frontend URL
+  origin: ['http://localhost:3000', 'https://your-frontend.vercel.app'], // Add your frontend's public URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
