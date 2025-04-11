@@ -102,7 +102,7 @@ function ShowsList() {
     imdb_rating: ''
   });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const theme = useTheme();
 
   useEffect(() => {
@@ -214,6 +214,10 @@ function ShowsList() {
   const filteredShows = selectedGenre === 'All' 
     ? shows 
     : shows.filter(show => show.genre.includes(selectedGenre));
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Box sx={{ 
