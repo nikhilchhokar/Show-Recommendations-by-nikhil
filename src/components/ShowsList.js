@@ -3,26 +3,16 @@ import {
   Box,
   Typography,
   Grid,
-  TextField,
-  Button,
   Paper,
   Tabs,
   Tab,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Snackbar,
   Alert,
   IconButton,
   Stack,
   Chip,
-  useTheme,
-  Checkbox,
-  FormControlLabel,
-  FormGroup
+  useTheme
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
@@ -45,20 +35,6 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   },
 }));
 
-const StyledButton = styled(Button)(({ theme }) => ({
-  background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-  border: 0,
-  borderRadius: '12px',
-  color: 'white',
-  padding: '10px 24px',
-  boxShadow: '0 3px 5px 2px rgba(33, 203, 243, .3)',
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: '0 6px 10px 4px rgba(33, 203, 243, .3)',
-  },
-}));
-
 const StyledTabs = styled(Tabs)(({ theme }) => ({
   '& .MuiTabs-indicator': {
     background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
@@ -77,30 +53,11 @@ const StyledTab = styled(Tab)(({ theme }) => ({
   },
 }));
 
-const StyledDialog = styled(Dialog)(({ theme }) => ({
-  '& .MuiDialog-paper': {
-    background: 'linear-gradient(145deg, #1a1a1a, #2a2a2a)',
-    borderRadius: '16px',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-  },
-}));
-
 function ShowsList() {
   const [shows, setShows] = useState([]);
   const [genres, setGenres] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState('All');
-  const [selectedGenres, setSelectedGenres] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
-  const [openAddShowDialog, setOpenAddShowDialog] = useState(false);
-  const [showForm, setShowForm] = useState({
-    title: '',
-    genre: '',
-    rating: 0,
-    poster: '',
-    year: '',
-    imdb_rating: ''
-  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
@@ -146,56 +103,6 @@ function ShowsList() {
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
-
-  const handleShowInputChange = (e) => {
-    const { name, value } = e.target;
-    setShowForm(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleGenreChange = (event) => {
-    const { value, checked } = event.target;
-    setSelectedGenres((prev) =>
-      checked ? [...prev, value] : prev.filter((genre) => genre !== value)
-    );
-  };
-
-  const handleAddShow = async () => {
-    if (!showForm.title || selectedGenres.length === 0) {
-      setError('Please fill in all required fields and select at least one genre.');
-      return;
-    }
-  
-    try {
-      const newShow = {
-        title: showForm.title,
-        year: showForm.year || null,
-        genre: selectedGenres.join(', '), // Combine selected genres into a string
-        poster: showForm.poster || null,
-        imdb_rating: showForm.rating || null, // Ensure rating is included
-      };
-  
-      console.log('Adding show:', newShow); // Debugging log
-      const response = await axios.post(`${API_URL}/shows`, newShow);
-      console.log('Add show response:', response.data);
-      setShows(prev => [...prev, response.data]);
-      setShowForm({
-        title: '',
-        year: '',
-        genre: '',
-        poster: '',
-        rating: '', // Reset the rating field
-      });
-      setSelectedGenres([]); // Reset selected genres
-      setOpenAddShowDialog(false);
-    } catch (error) {
-      console.error('Error adding show:', error);
-      setError('Failed to add show. Please try again.');
-    }
-  };
-  
 
   const handleDeleteShow = async (id) => {
     if (!window.confirm('Are you sure you want to delete this show?')) {
@@ -272,91 +179,7 @@ function ShowsList() {
                   />
                 ))}
               </Stack>
-              <StyledButton
-                startIcon={<AddIcon />}
-                onClick={() => setOpenAddShowDialog(true)}
-              >
-                Add Show
-              </StyledButton>
             </Box>
-
-            <StyledDialog 
-              open={openAddShowDialog} 
-              onClose={() => setOpenAddShowDialog(false)}
-              maxWidth="sm"
-              fullWidth
-            >
-              <DialogTitle sx={{ 
-                color: theme.palette.primary.main,
-                textAlign: 'center',
-                fontWeight: 'bold'
-              }}>
-                Add New Show
-              </DialogTitle>
-              <DialogContent>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
-                  <TextField
-                    label="Title"
-                    name="title"
-                    value={showForm.title}
-                    onChange={handleShowInputChange}
-                    required
-                  />
-                  <TextField
-                    label="Year"
-                    name="year" // Add this field for the year
-                    value={showForm.year}
-                    onChange={handleShowInputChange}
-                    required
-                  />
-                  <TextField
-                    label="Poster URL"
-                    name="poster"
-                    value={showForm.poster}
-                    onChange={handleShowInputChange}
-                  />
-                  <TextField
-                    label="Rating"
-                    name="rating"
-                    value={showForm.rating}
-                    onChange={handleShowInputChange}
-                  />
-
-                  {/* Genre Checkboxes */}
-                  <FormGroup>
-                    {genres.map((genre) => (
-                      <FormControlLabel
-                        key={genre}
-                        control={
-                          <Checkbox
-                            value={genre}
-                            checked={selectedGenres.includes(genre)}
-                            onChange={handleGenreChange}
-                          />
-                        }
-                        label={genre}
-                      />
-                    ))}
-                  </FormGroup>
-                </Box>
-              </DialogContent>
-              <DialogActions sx={{ p: 2 }}>
-                <Button 
-                  onClick={() => setOpenAddShowDialog(false)}
-                  sx={{ 
-                    color: theme.palette.text.secondary,
-                    '&:hover': {
-                      color: theme.palette.primary.main
-                    }
-                  }}
-                >
-                  Cancel
-                </Button>
-                <StyledButton onClick={handleAddShow}>
-                  Add Show
-                </StyledButton>
-              </DialogActions>
-            </StyledDialog>
 
             <Grid container spacing={3}>
               {filteredShows.map((show) => (
