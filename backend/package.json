@@ -4,8 +4,8 @@
   "description": "Backend for Show Recommendations App",
   "main": "server.js",
   "scripts": {
-    "start": "node --max-old-space-size=2048 src/server.js",
-    "dev": "nodemon src/server.js",
+    "start": "node --max-old-space-size=2048 server.js",
+    "dev": "nodemon server.js",
     "build": "echo 'No build step required'",
     "postinstall": "cd backend && npm install"
   },
