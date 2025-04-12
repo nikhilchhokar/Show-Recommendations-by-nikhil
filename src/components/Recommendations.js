@@ -16,7 +16,7 @@ import { styled } from '@mui/material/styles';
 import axios from 'axios';
 
 // Use environment variable for API URL
-const API_URL = 'http://localhost:5001/api';
+const API_URL = process.env.REACT_APP_API_URL;
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   background: 'linear-gradient(145deg, #1a1a1a, #2a2a2a)',
