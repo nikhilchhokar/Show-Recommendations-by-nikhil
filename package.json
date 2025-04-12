@@ -8,8 +8,7 @@
     "start": "node --max-old-space-size=2048 server.js",
     "dev": "nodemon server.js",
     "build": "echo 'No build step required'",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "postinstall": "cd backend && npm install"
   },
   "dependencies": {
     "@emotion/react": "^11.11.3",
