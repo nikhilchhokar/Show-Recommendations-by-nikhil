@@ -8,12 +8,10 @@ import {
   Tab,
   Snackbar,
   Alert,
-  IconButton,
   Stack,
   Chip,
   useTheme
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
 import ShowCard from './ShowCard';
@@ -104,20 +102,6 @@ function ShowsList() {
     setActiveTab(newValue);
   };
 
-  const handleDeleteShow = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this show?')) {
-      return;
-    }
-
-    try {
-      await axios.delete(`${API_URL}/shows/${id}`);
-      setShows(prev => prev.filter(show => show.id !== id));
-    } catch (error) {
-      console.error('Error deleting show:', error);
-      setError('Failed to delete show');
-    }
-  };
-
   const filteredShows = selectedGenre === 'All' 
     ? shows 
     : shows.filter(show => show.genre.includes(selectedGenre));
@@ -184,23 +168,7 @@ function ShowsList() {
             <Grid container spacing={3}>
               {filteredShows.map((show) => (
                 <Grid item xs={12} sm={6} md={4} key={show.id}>
-                  <Box sx={{ position: 'relative' }}>
-                    <ShowCard show={show} />
-                    <IconButton
-                      onClick={() => handleDeleteShow(show.id)}
-                      sx={{
-                        position: 'absolute',
-                        top: 8,
-                        right: 8,
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        '&:hover': {
-                          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                        },
-                      }}
-                    >
-                      <DeleteIcon sx={{ color: 'white' }} />
-                    </IconButton>
-                  </Box>
+                  <ShowCard show={show} />
                 </Grid>
               ))}
             </Grid>
