@@ -59,18 +59,19 @@ npm start
    ```
 5. Deploy
 
-### Backend (Railway)
-
-1. Push your code to GitHub
-2. Go to [Railway](https://railway.app)
-3. Create a new project
-4. Add PostgreSQL database
-5. Add environment variables:
-   ```
-   DATABASE_URL=postgresql://postgres:your_password@containers-us-west-XX.railway.app:XXXX/railway
+### Backend (Render)
+1.Push code to GitHub
+2.Go to Render → New Web Service
+3.Connect your repo and set:
+ * Build Command: npm install
+ * Start Command: node index.js (or your entry file)
+4.Add environment variables:
+````
+   DATABASE_URL=your_postgres_url
    PORT=5001
-   ```
-6. Deploy
+````
+5.Create a PostgreSQL DB on Render and link the connection string
+6.Deploy – auto-redeploys on every push 
 
 ## Contributing
 
